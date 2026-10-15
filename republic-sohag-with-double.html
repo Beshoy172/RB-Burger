@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REPUBLIC - Fine Dining & Lounge | المنيو الرقمي الفاخر</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Tajawal & Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- QRCode.js for live QR code generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                        },
+                        darkBg: '#030712',
+                        cardBg: '#0f172a',
+                        cardHover: '#1e293b'
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+        }
+        /* Custom Scrollbar for smooth menu horizontal browsing */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-border-glow {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+        }
+        /* Toast notification animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-slate-100 min-h-screen flex flex-col antialiased pb-28">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-gold-500/20 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-gold-600 to-amber-300 p-0.5 flex items-center justify-center shadow-lg shadow-gold-500/10">
+                    <div class="w-full h-full bg-darkBg rounded-full flex items-center justify-center">
+                        <span class="text-gold-400 font-black text-xl tracking-tighter">R</span>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-black text-lg sm:text-xl tracking-wider uppercase gold-gradient-text">REPUBLIC</h1>
+                    <p class="text-[10px] text-slate-400 tracking-widest font-semibold">FINE DINING & LOUNGE</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="openTableModal()" class="hidden sm:flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-700 text-amber-400 border border-amber-500/30 text-xs px-3 py-1.5 rounded-full transition">
+                    <i class="fa-solid fa-chair text-sm"></i>
+                    <span id="currentTableNav">رقم الترابيزة</span>
+                </button>
+                <a href="tel:01156101103" class="w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 bg-gold-500/10 border border-gold-500/30 text-gold-400 hover:bg-gold-500 hover:text-slate-950 rounded-full flex items-center justify-center text-xs font-bold transition">
+                    <i class="fa-solid fa-phone"></i>
+                    <span class="hidden sm:inline mr-1.5">اتصال</span>
+                </a>
+                <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-gold-500 text-slate-950 rounded-full font-bold hover:bg-gold-400 transition shadow-lg shadow-gold-500/20">
+                    <i class="fa-solid fa-utensils text-sm"></i>
+                    <span id="cartCountBadge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-black border-2 border-slate-950 hidden">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="relative overflow-hidden pt-8 pb-12 px-4 border-b border-slate-800/80">
+        <!-- Background Ambient Glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-4xl mx-auto text-center relative z-10 space-y-4">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-semibold">
+                <i class="fa-solid fa-crown text-xs"></i> التجربة الأفخم في سوهاج
+            </span>
+            
+            <h2 class="text-3xl sm:text-5xl font-black text-white leading-tight">
+                تجربة طعام استثنائية في قلب <span class="gold-gradient-text">سوهاج</span>
+            </h2>
+            
+            <p class="text-slate-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-tajawal">
+                استمتع بأشهى الأطباق العالمية والمشويات الفاخرة المجهزة بشغف بأيدي أمهر الطهاة في أجواء راقية لا تُنسى.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs text-slate-300">
+                <span class="flex items-center gap-1.5 bg-slate-900/60 px-3 py-1.5 rounded-full border border-slate-800">
+                    <i class="fa-solid fa-location-dot text-gold-500"></i> سوهاج - طريق الثقافة / الاستاد
+                </span>
+                <span class="flex items-center gap-1.5 bg-slate-900/60 px-3 py-1.5 rounded-full border border-slate-800">
+                    <i class="fa-solid fa-clock text-gold-500"></i> يومياً: 12:00 م - 2:00 ص
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search & Quick Navigation Bar -->
+    <div class="sticky top-[61px] z-30 glass-panel border-b border-slate-800 py-3 shadow-xl">
+        <div class="max-w-6xl mx-auto px-4 space-y-3">
+            <!-- Search Input -->
+            <div class="relative max-w-md mx-auto">
+                <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="ابحث عن طبقك المفضل (استيك، بيتزا، موهيتو...)" 
+                       class="w-full bg-slate-900/90 border border-slate-700/60 rounded-xl pr-10 pl-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-gold-500 transition">
+            </div>
+
+            <!-- Categories Horizontal Scroll -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs" id="categoriesContainer">
+                <!-- Injected dynamically via JS -->
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-10">
+
+        <!-- Special Recommendations Carousel/Banner -->
+        <section class="bg-gradient-to-r from-amber-950/40 via-slate-900 to-amber-950/40 border border-gold-500/30 rounded-2xl p-5 relative overflow-hidden">
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-gold-500/10 rounded-full blur-2xl"></div>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+                <div class="space-y-1 text-center sm:text-right">
+                    <span class="text-amber-400 text-[11px] font-bold tracking-widest uppercase">🌟 التوصية المتميزة لهذا اليوم</span>
+                    <h3 class="text-xl font-bold text-white">وجبة العائلة أو الأصدقاء الملكية</h3>
+                    <p class="text-slate-400 text-xs">احصل على خصم 15% عند طلب مشويات ريبابلك المشكلة لشخصين أو أكثر.</p>
+                </div>
+                <button onclick="filterCategory('mains')" class="bg-gold-500 hover:bg-gold-400 text-slate-950 text-xs font-black px-5 py-2.5 rounded-xl transition shadow-lg shadow-gold-500/20 whitespace-nowrap">
+                    اطلب العرض الآن
+                </button>
+            </div>
+        </section>
+
+        <!-- Menu Section Title -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-6 bg-gold-500 rounded-full"></div>
+                <h3 id="currentCategoryTitle" class="text-xl font-bold text-white">قائمة الأطباق</h3>
+            </div>
+            <span id="itemsCountTag" class="text-xs text-slate-400 font-semibold">12 صنف متاح</span>
+        </div>
+
+        <!-- Food Cards Grid -->
+        <div id="foodGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dishes injected via JS -->
+        </div>
+
+        <!-- Interactive QR Code Feature Showcase for Republic Owner -->
+        <section class="border border-gold-500/20 rounded-2xl bg-slate-900/60 p-6 sm:p-8 space-y-6 mt-12 relative overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div class="md:col-span-2 space-y-3">
+                    <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] rounded-md font-bold">
+                        ⚡ خدمة الترابيزات والطلب الذكي
+                    </span>
+                    <h3 class="text-2xl font-black text-white">خدمة المنيو التفاعلي بالـ QR Code للترابيزات</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                        يستطيع عميلك في مطعم ريبابلك مسح الـ QR Code الموجود على ترابيزته، اختيار رقم الترابيزة، تصفح الصور والأطعمة بمرونة، وإرسال الطلب مباشرة للواتساب أو الكاشير بدون أي تأخير!
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <button onclick="openTableModal()" class="bg-slate-800 hover:bg-slate-700 text-gold-400 border border-gold-500/30 text-xs font-bold px-4 py-2 rounded-xl transition">
+                            <i class="fa-solid fa-qrcode ml-1"></i> تجربة اختيار الترابيزة
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dynamic QR Box -->
+                <div class="flex flex-col items-center justify-center p-4 bg-slate-950 border border-slate-800 rounded-xl text-center space-y-3">
+                    <div id="qrcode" class="bg-white p-2.5 rounded-lg shadow-inner"></div>
+                    <p class="text-[11px] text-slate-400 font-semibold">امسح الكود لتجربة المنيو على موبايلك</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Floating Cart Bar (Appears when items are in cart) -->
+    <div id="floatingCartBar" class="fixed bottom-4 left-4 right-4 max-w-lg mx-auto z-40 transform translate-y-32 transition-transform duration-300">
+        <div class="glass-panel border-2 border-gold-500/50 rounded-2xl p-3 shadow-2xl flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gold-500 rounded-xl text-slate-950 flex items-center justify-center font-black text-base shadow-md">
+                    <span id="floatingCartCount">0</span>
+                </div>
+                <div>
+                    <div class="text-[11px] text-slate-400">إجمالي الطلب:</div>
+                    <div class="text-base font-bold text-white"><span id="floatingCartTotal">0</span> ج.م</div>
+                </div>
+            </div>
+            <button onclick="openCheckoutModal()" class="bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-slate-950 font-black text-xs px-5 py-3 rounded-xl transition shadow-lg shadow-gold-500/20 flex items-center gap-2">
+                <span>إكمال الطلب واتساب</span>
+                <i class="fa-brands fa-whatsapp text-base"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Checkout / WhatsApp Order Details -->
+    <div id="checkoutModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-gold-500/30 w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-emerald-400 text-xl"></i> تأكيد الطلب عبر الواتساب
+                </h3>
+                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Order Items Summary List -->
+            <div id="modalCartSummary" class="space-y-2 bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-xs max-h-36 overflow-y-auto">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">نوع الطلب:</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="setOrderType('dine-in')" id="btnOrderDineIn" class="order-type-btn py-2 border border-slate-700 rounded-xl bg-slate-800 text-slate-200 font-bold active-type">داخل المطعم</button>
+                        <button type="button" onclick="setOrderType('takeaway')" id="btnOrderTakeaway" class="order-type-btn py-2 border border-slate-700 rounded-xl bg-slate-900 text-slate-400 font-bold">تيك أواي</button>
+                        <button type="button" onclick="setOrderType('delivery')" id="btnOrderDelivery" class="order-type-btn py-2 border border-slate-700 rounded-xl bg-slate-900 text-slate-400 font-bold">دليفري</button>
+                    </div>
+                </div>
+
+                <div id="tableNumField">
+                    <label class="block text-slate-300 font-semibold mb-1">رقم الترابيزة:</label>
+                    <input type="number" id="inputTableNum" placeholder="مثال: 5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-gold-500">
+                </div>
+
+                <div id="addressField" class="hidden">
+                    <label class="block text-slate-300 font-semibold mb-1">عنوان التوصيل التفصيلي (سوهاج):</label>
+                    <input type="text" id="inputAddress" placeholder="المنطقة، الشارع، رقم العمارة/الشقة" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-gold-500">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">الاسم الكريم:</label>
+                    <input type="text" id="inputCustomerName" placeholder="اكتب اسمك هنا" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-gold-500">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">ملاحظات إضافية (اختياري):</label>
+                    <textarea id="inputNotes" rows="2" placeholder="بدون بصل، درجة تسوية الاستيك..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-gold-500"></textarea>
+                </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] text-slate-400 block">الإجمالي النهائي</span>
+                    <span id="modalCartTotal" class="text-lg font-black text-gold-400">0</span> <span class="text-xs text-gold-400 font-bold">ج.م</span>
+                </div>
+                <button onclick="sendOrderToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3 rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+                    <span>إرسال للواتساب</span>
+                    <i class="fa-brands fa-whatsapp text-base"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Select Table Number Quick Modal -->
+    <div id="tableModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-gold-500/30 w-full max-w-xs rounded-2xl p-5 text-center space-y-4">
+            <h3 class="text-base font-bold text-white">اختر رقم الترابيزة</h3>
+            <p class="text-xs text-slate-400">حدد رقم الطاولة لتسهيل إرسال الطلب لخدمة الصالة</p>
+            <div class="grid grid-cols-4 gap-2 text-sm font-bold text-slate-200">
+                <button onclick="selectQuickTable(1)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">1</button>
+                <button onclick="selectQuickTable(2)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">2</button>
+                <button onclick="selectQuickTable(3)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">3</button>
+                <button onclick="selectQuickTable(4)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">4</button>
+                <button onclick="selectQuickTable(5)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">5</button>
+                <button onclick="selectQuickTable(6)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">6</button>
+                <button onclick="selectQuickTable(7)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">7</button>
+                <button onclick="selectQuickTable(8)" class="p-2.5 bg-slate-800 hover:bg-gold-500 hover:text-slate-950 rounded-xl transition">8</button>
+            </div>
+            <button onclick="closeTableModal()" class="w-full bg-slate-800 text-slate-400 py-2 rounded-xl text-xs font-semibold">إلغاء</button>
+        </div>
+    </div>
+
+
+    <!-- Double Sandwich Selection Modal -->
+    <div id="sandwichModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[80] hidden items-center justify-center p-4">
+        <div class="w-full max-w-sm bg-slate-900 border border-gold-500/30 rounded-3xl p-5 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-xs text-gold-400 font-bold">تخصيص الساندوتش</p>
+                    <h3 id="sandwichModalName" class="text-lg font-black text-white"></h3>
+                </div>
+                <button onclick="closeSandwichModal()" class="w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white">×</button>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 mb-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white font-bold">ساندوتش دبل 🔥</p>
+                        <p class="text-xs text-slate-400 mt-1">ضعف كمية اللحم/الحشوة</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input id="doubleSandwichCheck" type="checkbox" class="sr-only peer" onchange="updateDoublePrice()">
+                        <div class="w-12 h-7 bg-slate-700 rounded-full peer peer-checked:bg-gold-500 transition"></div>
+                        <div class="absolute right-6 top-1 w-5 h-5 bg-white rounded-full transition peer-checked:translate-x-5"></div>
+                    </label>
+                </div>
+                <div class="mt-3 flex justify-between text-xs">
+                    <span class="text-slate-400">الإضافة</span>
+                    <span class="text-gold-400 font-black">+35 ج.م</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-slate-800/60 rounded-2xl px-4 py-3 mb-4">
+                <span class="text-slate-300 text-sm">السعر النهائي</span>
+                <span id="sandwichFinalPrice" class="text-xl font-black text-gold-400"></span>
+            </div>
+
+            <button onclick="confirmSandwichAdd()" class="w-full bg-gold-500 hover:bg-gold-400 text-slate-950 font-black py-3 rounded-2xl transition">
+                أضف للسلة
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none"></div>
+
+    <script>
+        // Sample High-Quality Menu Items Data for Republic Sohag
+        const menuData = [
+            {
+                id: 1,
+                name: "ريبابلك ريب آي استيك (Ribeye Steak)",
+                category: "mains",
+                categoryName: "الأطباق الرئيسية",
+                price: 420,
+                desc: "قطعة استيك أنجوس فاخرة مع سوس المشروم الكريمي أو البلاك بيبر، تقدم مع خضار سوتيه وبطاطس ودجز.",
+                tag: "🌟 توقيع الشيف",
+                image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 2,
+                name: "تشيكن كوردون بلو فاخر",
+                category: "mains",
+                categoryName: "الأطباق الرئيسية",
+                price: 280,
+                desc: "صدور دجاج محشوة روزبيف وجبنة إيمانتال السويسرية المقرمشة، تقدم مع باستا ألبينك صوس.",
+                tag: "🔥 الأكثر طلباً",
+                image: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 3,
+                name: "ريبابلك ترفل برجر (Truffle Burger)",
+                category: "burgers",
+                categoryName: "البرجر والجرميه",
+                price: 210,
+                desc: "شريحة لحم بقر بلاك أنجوس 200 جرام، صوس الترابيل الملكي، بصل كراميل، وجبنة شيدر معتقة.",
+                tag: "🍔 جزر ميه",
+                image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 4,
+                name: "سموكي بيكن برجر",
+                category: "burgers",
+                categoryName: "البرجر والجرميه",
+                price: 195,
+                desc: "شريحة لحم مشوية على الفحم مع بيكن بقر مقرمش، صوس الباربكيو المدخن وحلقات البصل المقرمشة.",
+                tag: "🔥 الأكثر طلباً",
+                image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 5,
+                name: "بيتزا كواترو فورماجي (4 أجبان)",
+                category: "pizza",
+                categoryName: "الباستا والبيتزا",
+                price: 230,
+                desc: "عجينة نابوليتانية إيطالية مع الموزاريلا الفريش، الجورجونزولا، الباررميجانو والشيدر الإيطالي.",
+                tag: "🍕 نابولي فريش",
+                image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 6,
+                name: "سالمون ألفريدو باستا",
+                category: "pizza",
+                categoryName: "الباستا والبيتزا",
+                price: 260,
+                desc: "مكرونة فيتوتشيني الإيطالية مع قطع السالمون المدخن وصوس الكريمة الغنية بالبارميزان والأعشاب.",
+                tag: "🌟 توقيع الشيف",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9dybMS2j2J-mvPAf2tGL6axCrSzCJGGVIRFMWBAjORg&s=10"
+            },
+            {
+                id: 7,
+                name: "شوربة سي فود ريبابلك الملكية",
+                category: "appetizers",
+                categoryName: "المقبلات والسلاطات",
+                price: 180,
+                desc: "جمبري، جمبري استاكوزا، كابوريا وسمك فيليه في كريمة الغراتان الغنية بالأعشاب الفريدة.",
+                tag: "🦐 طازج يومياً",
+                image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 8,
+                name: "سيزر سلاط مع دجاج مشوي",
+                category: "appetizers",
+                categoryName: "المقبلات والسلاطات",
+                price: 140,
+                desc: "خس كابوتشا طازج مع دريسنج السيزر الأصلي، كروتوت محمص وشريحة دجاج جيلد مشوية.",
+                tag: "🥑 صحي",
+                image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 9,
+                name: "كوكتيل ريبابلك سيجنتشر موهيتو",
+                category: "drinks",
+                categoryName: "المشروبات والكوكتيلات",
+                price: 85,
+                desc: "مزج منتعش من الليمون الفريش، النعناع البلدي، صوس الباشن فروت والسودا الفوارة.",
+                tag: "🍹 منتعش",
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 10,
+                name: "سبانيش لاتيه بارد (Iced Spanish Latte)",
+                category: "drinks",
+                categoryName: "المشروبات والكوكتيلات",
+                price: 75,
+                desc: "إسبريسو إيطالي مركز مع الحليب الطازج والحليب المكثف المحلى وقطع الثلج.",
+                tag: "☕ الأكثر طلباً",
+                image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 11,
+                name: "مولتن كيك الشوكولاتة مع آيس كريم",
+                category: "desserts",
+                categoryName: "الحلويات",
+                price: 110,
+                desc: "كيك شوكولاتة بلجيكية ساخنة بقلب الشوكولاتة السائلة، تقدم مع بولات آيس كريم الفانيليا.",
+                tag: "🍰 شوكولاتة فاخرة",
+                image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 12,
+                name: "تشيز كيك التوت الأزرق (Blueberry Cheesecake)",
+                category: "desserts",
+                categoryName: "الحلويات",
+                price: 95,
+                desc: "تشيز كيك على الطريقة النيويوركية مع صوس التوت الأزرق الطبيعي.",
+                tag: "✨ مميز",
+                image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500&auto=format&fit=crop&q=80"
+            }
+        ];
+
+        const categories = [
+            { id: "all", name: "الكل", icon: "fa-border-all" },
+            { id: "mains", name: "الأطباق الرئيسية", icon: "fa-drumstick-bite" },
+            { id: "burgers", name: "البرجر والجرميه", icon: "fa-burger" },
+            { id: "pizza", name: "الباستا والبيتزا", icon: "fa-pizza-slice" },
+            { id: "appetizers", name: "المقبلات والسلاطات", icon: "fa-bowl-food" },
+            { id: "drinks", name: "المشروبات والكوكتيلات", icon: "fa-glass-martini-alt" },
+            { id: "desserts", name: "الحلويات", icon: "fa-cake-candles" }
+        ];
+
+        // App State Variables
+        let currentCategory = 'all';
+        let cart = [];
+        let selectedTable = null;
+        let orderType = 'dine-in';
+        let selectedSandwich = null;
+        const DOUBLE_ADDON_PRICE = 35;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderFoodItems();
+            initQRCode();
+        });
+
+        // Render Category Filter Pills
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat.id}')" 
+                        class="category-btn flex items-center gap-1.5 px-4 py-2 rounded-xl border transition whitespace-nowrap font-bold text-xs ${currentCategory === cat.id ? 'bg-gold-500 border-gold-500 text-slate-950 shadow-md' : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-gold-500/40'}">
+                    <i class="fa-solid ${cat.icon}"></i>
+                    <span>${cat.name}</span>
+                </button>
+            `).join('');
+        }
+
+        // Filter Category
+        function filterCategory(catId) {
+            currentCategory = catId;
+            renderCategories();
+            
+            const catObj = categories.find(c => c.id === catId);
+            document.getElementById('currentCategoryTitle').innerText = catObj ? catObj.name : 'قائمة الأطباق';
+            
+            renderFoodItems();
+        }
+
+        // Search Filter
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            renderFoodItems(query);
+        }
+
+        // Render Food Grid Cards
+        function renderFoodItems(searchQuery = '') {
+            const grid = document.getElementById('foodGrid');
+            let filtered = menuData;
+
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(item => item.category === currentCategory);
+            }
+
+            if (searchQuery) {
+                filtered = filtered.filter(item => 
+                    item.name.toLowerCase().includes(searchQuery) || 
+                    item.desc.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            document.getElementById('itemsCountTag').innerText = `${filtered.length} صنف متاح`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 space-y-3">
+                        <i class="fa-solid fa-utensils text-4xl text-slate-700"></i>
+                        <p class="text-slate-400 text-sm font-semibold">لم نجد أطباق مطابقة لبحثك في المنيو</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const cartQty = getCartItemQty(item.id);
+                return `
+                <div class="bg-cardBg border border-slate-800/80 rounded-2xl overflow-hidden hover:border-gold-500/40 transition duration-300 flex flex-col justify-between group hover:shadow-xl hover:shadow-gold-500/5">
+                    <div>
+                        <!-- Image Container -->
+                        <div class="relative h-44 overflow-hidden bg-slate-950">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-cardBg via-transparent to-transparent"></div>
+                            
+                            <!-- Tag Badge -->
+                            <span class="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md border border-gold-500/30 text-amber-300 text-[10px] font-bold px-2.5 py-1 rounded-full">
+                                ${item.tag}
+                            </span>
+                        </div>
+
+                        <!-- Content Container -->
+                        <div class="p-4 space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="font-bold text-white text-base group-hover:text-gold-400 transition">${item.name}</h4>
+                            </div>
+                            <p class="text-slate-400 text-xs leading-relaxed line-clamp-2 font-tajawal">${item.desc}</p>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer / Price & Add to Cart -->
+                    <div class="p-4 pt-0 flex items-center justify-between border-t border-slate-800/40 mt-3">
+                        <div>
+                            <span class="text-lg font-black text-gold-400">${item.price}</span>
+                            <span class="text-[11px] text-slate-400 font-bold">ج.م</span>
+                        </div>
+
+                        ${item.category === 'burgers' ? `
+                            <button onclick="openSandwichModal(${item.id})" class="bg-slate-800 hover:bg-gold-500 hover:text-slate-950 border border-gold-500/30 hover:border-gold-500 text-gold-400 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                                <span>اختار الساندوتش</span>
+                                <i class="fa-solid fa-sliders text-xs"></i>
+                            </button>
+                        ` : cartQty > 0 ? `
+                            <div class="flex items-center gap-2 bg-gold-500/10 border border-gold-500/40 rounded-xl p-1">
+                                <button onclick="updateCartQty(${item.id}, -1)" class="w-7 h-7 bg-gold-500 text-slate-950 rounded-lg flex items-center justify-center font-bold hover:bg-gold-400 transition text-xs">-</button>
+                                <span class="font-bold text-gold-400 text-xs px-1">${cartQty}</span>
+                                <button onclick="updateCartQty(${item.id}, 1)" class="w-7 h-7 bg-gold-500 text-slate-950 rounded-lg flex items-center justify-center font-bold hover:bg-gold-400 transition text-xs">+</button>
+                            </div>
+                        ` : `
+                            <button onclick="addToCart(${item.id})" class="bg-slate-800 hover:bg-gold-500 hover:text-slate-950 border border-slate-700 hover:border-gold-500 text-gold-400 text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+                                <span>أضف للطلب</span>
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
+                        `}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function openSandwichModal(itemId) {
+            const item = menuData.find(i => i.id === itemId);
+            if (!item) return;
+            selectedSandwich = item;
+            document.getElementById('sandwichModalName').innerText = item.name;
+            document.getElementById('doubleSandwichCheck').checked = false;
+            document.getElementById('sandwichFinalPrice').innerText = `${item.price} ج.م`;
+            const modal = document.getElementById('sandwichModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSandwichModal() {
+            const modal = document.getElementById('sandwichModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            selectedSandwich = null;
+        }
+
+        function updateDoublePrice() {
+            if (!selectedSandwich) return;
+            const isDouble = document.getElementById('doubleSandwichCheck').checked;
+            const finalPrice = selectedSandwich.price + (isDouble ? DOUBLE_ADDON_PRICE : 0);
+            document.getElementById('sandwichFinalPrice').innerText = `${finalPrice} ج.م`;
+        }
+
+        function confirmSandwichAdd() {
+            if (!selectedSandwich) return;
+            const isDouble = document.getElementById('doubleSandwichCheck').checked;
+            const finalPrice = selectedSandwich.price + (isDouble ? DOUBLE_ADDON_PRICE : 0);
+            const variantId = `${selectedSandwich.id}-${isDouble ? 'double' : 'single'}`;
+
+            const existing = cart.find(c => c.variantId === variantId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    ...selectedSandwich,
+                    qty: 1,
+                    variantId,
+                    isDouble,
+                    originalPrice: selectedSandwich.price,
+                    price: finalPrice
+                });
+            }
+
+            updateCartUI();
+            showToast(isDouble
+                ? `تمت إضافة "${selectedSandwich.name}" دبل (+35 ج.م) للسلة`
+                : `تمت إضافة "${selectedSandwich.name}" للسلة`);
+            closeSandwichModal();
+            renderFoodItems();
+        }
+
+        function addToCart(itemId) {
+            const item = menuData.find(i => i.id === itemId);
+            if (!item) return;
+
+            const existing = cart.find(c => c.id === itemId && !c.isDouble);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1, variantId: `${item.id}-single`, isDouble: false });
+            }
+
+            updateCartUI();
+            showToast(`تمت إضافة "${item.name}" لسلة الطلب`);
+            renderFoodItems();
+        }
+
+        function updateCartQty(itemId, delta) {
+            const index = cart.findIndex(c => c.id === itemId);
+            if (index !== -1) {
+                cart[index].qty += delta;
+                if (cart[index].qty <= 0) {
+                    cart.splice(index, 1);
+                }
+            }
+            updateCartUI();
+            renderFoodItems();
+        }
+
+        function getCartItemQty(itemId) {
+            const item = cart.find(c => c.id === itemId);
+            return item ? item.qty : 0;
+        }
+
+        function updateCartUI() {
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            // Update Badge
+            const badge = document.getElementById('cartCountBadge');
+            badge.innerText = totalCount;
+            if (totalCount > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+
+            // Update Floating Bar
+            const bar = document.getElementById('floatingCartBar');
+            document.getElementById('floatingCartCount').innerText = totalCount;
+            document.getElementById('floatingCartTotal').innerText = totalPrice;
+
+            if (totalCount > 0) {
+                bar.classList.remove('translate-y-32');
+            } else {
+                bar.classList.add('translate-y-32');
+            }
+        }
+
+        // Toast Notification Helper
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bg-gold-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-full shadow-2xl animate-slide-up flex items-center gap-2 border border-amber-300';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${message}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 2500);
+        }
+
+        function setOrderType(type) {
+            orderType = type;
+            document.querySelectorAll('.order-type-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-slate-200', 'active-type');
+                btn.classList.add('bg-slate-900', 'text-slate-400');
+            });
+
+            if (type === 'dine-in') {
+                document.getElementById('btnOrderDineIn').classList.add('bg-slate-800', 'text-slate-200', 'active-type');
+                document.getElementById('tableNumField').classList.remove('hidden');
+                document.getElementById('addressField').classList.add('hidden');
+            } else if (type === 'delivery') {
+                document.getElementById('btnOrderDelivery').classList.add('bg-slate-800', 'text-slate-200', 'active-type');
+                document.getElementById('tableNumField').classList.add('hidden');
+                document.getElementById('addressField').classList.remove('hidden');
+            } else {
+                document.getElementById('btnOrderTakeaway').classList.add('bg-slate-800', 'text-slate-200', 'active-type');
+                document.getElementById('tableNumField').classList.add('hidden');
+                document.getElementById('addressField').classList.add('hidden');
+            }
+        }
+
+        function openTableModal() {
+            document.getElementById('tableModal').classList.remove('hidden');
+        }
+        function closeTableModal() {
+            document.getElementById('tableModal').classList.add('hidden');
+        }
+        function selectQuickTable(num) {
+            selectedTable = num;
+            document.getElementById('inputTableNum').value = num;
+            document.getElementById('currentTableNav').innerText = `ترابيزة #${num}`;
+            closeTableModal();
+            showToast(`تم تحديد ترابيزة رقم ${num}`);
+        }
+
+        function openCheckoutModal() {
+            if (cart.length === 0) return;
+
+            const summaryContainer = document.getElementById('modalCartSummary');
+            summaryContainer.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between py-1 border-b border-slate-800/60 last:border-none">
+                    <span class="text-slate-200 font-semibold">${item.name}${item.isDouble ? " — دبل (+35 ج.م)" : ""} (x${item.qty})</span>
+                    <span class="text-gold-400 font-bold">${item.price * item.qty} ج.م</span>
+                </div>
+            `).join('');
+
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('modalCartTotal').innerText = totalPrice;
+
+            if (selectedTable) {
+                document.getElementById('inputTableNum').value = selectedTable;
+            }
+
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function toggleCartDrawer() {
+            if (cart.length > 0) openCheckoutModal();
+            else showToast('سلة الطلبات فارغة حالياً');
+        }
+
+        // Send Structured WhatsApp Message
+        function sendOrderToWhatsApp() {
+            if (cart.length === 0) return;
+
+            const name = document.getElementById('inputCustomerName').value.trim() || 'عميل ريبابلك';
+            const notes = document.getElementById('inputNotes').value.trim();
+            const tableNum = document.getElementById('inputTableNum').value.trim();
+            const address = document.getElementById('inputAddress').value.trim();
+
+            let typeLabel = "داخل المطعم (صالة)";
+            if (orderType === 'takeaway') typeLabel = "تيك أواي";
+            if (orderType === 'delivery') typeLabel = "توصيل دليفري";
+
+            let msg = `✨ *طلب جديد من المنيو الرقمي - REPUBLIC* ✨\n\n`;
+            msg += `👤 *الاسم:* ${name}\n`;
+            msg += `📍 *نوع الطلب:* ${typeLabel}\n`;
+
+            if (orderType === 'dine-in' && tableNum) {
+                msg += `🪑 *رقم الترابيزة:* ${tableNum}\n`;
+            }
+            if (orderType === 'delivery' && address) {
+                msg += `🏠 *العنوان:* ${address}\n`;
+            }
+
+            msg += `\n🛒 *تفاصيل الأطلبة:*\n`;
+            cart.forEach((item, index) => {
+                msg += `${index + 1}. ${item.name}${item.isDouble ? " (دبل +35 ج.م)" : ""} × ${item.qty} = ${item.price * item.qty} ج.م\n`;
+            });
+
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            msg += `\n💵 *الإجمالي الكلي:* ${totalPrice} ج.م\n`;
+
+            if (notes) {
+                msg += `📝 *ملاحظات:* ${notes}\n`;
+            }
+
+            msg += `\nشكراً لتواصلكم مع مطعم ريبابلك سوهاج! 👑`;
+
+            // Open WhatsApp with message
+            const phoneNumber = "201156101103"; // Placeholder Republic WhatsApp number
+            const encoded = encodeURIComponent(msg);
+            window.open(`https://wa.me/${phoneNumber}?text=${encoded}`, '_blank');
+        }
+
+        // Generate Live Demo QR Code
+        function initQRCode() {
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: window.location.href || "https://rb-burger-lovat.vercel.app/",
+                width: 110,
+                height: 110,
+                colorDark : "#030712",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+    </script>
+</body>
+</html>
